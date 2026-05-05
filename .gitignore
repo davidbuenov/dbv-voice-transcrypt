@@ -1,0 +1,19 @@
+# Entornos virtuales
+venv/
+backend/venv/
+.env
+
+# Directorios de cache y temporales
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Archivos de la aplicacion
+uploads/
+backend/uploads/
+
+# Modulo Gemma 4
+gemma4/bin/*
+!gemma4/bin/.keep
+gemma4/models/*
+!gemma4/models/.keep

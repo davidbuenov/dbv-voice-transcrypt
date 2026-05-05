@@ -1,0 +1,6 @@
+# Dependencias para el módulo de Gemma 4
+# Solo incluye lo necesario para lanzar el servidor.
+# Si lo sacas a otro proyecto, usa: pip install -r requirements.txt
+
+python-dotenv>=1.0.1
+huggingface-hub>=0.24.0
