@@ -1,5 +1,14 @@
 # 🎙️ DBV VoiceTranscrypt
 
+[![Release](https://img.shields.io/github/v/release/davidbuenov/dbv-voice-transcrypt?display_name=tag&sort=semver)](https://github.com/davidbuenov/dbv-voice-transcrypt/releases)
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)
+![Status](https://img.shields.io/badge/status-active-success)
+[![Last Update](https://img.shields.io/github/last-commit/davidbuenov/dbv-voice-transcrypt?label=last%20update)](https://github.com/davidbuenov/dbv-voice-transcrypt/commits/main)
+[![Framework](https://img.shields.io/badge/framework-dbv--specs--ops-111827?logo=github&logoColor=white)](https://github.com/davidbuenov/dbv-specs-ops)
+
 Una aplicación web moderna y segura diseñada para la transcripción y el análisis de audio de forma **100% local**. Ideal para reuniones corporativas, entrevistas, clases universitarias y notas de voz personales, donde la privacidad de la información es la máxima prioridad.
 
 ## 🌟 Características Principales
@@ -38,7 +47,9 @@ Una aplicación web moderna y segura diseñada para la transcripción y el anál
 
 ## 🧠 Metodología: Spec-Driven Development (SDD)
 
-Este proyecto sigue la metodología **Spec-Driven Development (SDD)**. La documentación en `docs/` es la fuente única de verdad:
+Este proyecto sigue la metodología **Spec-Driven Development (SDD)** utilizando el framework **dbv-specs-ops**: [https://github.com/davidbuenov/dbv-specs-ops](https://github.com/davidbuenov/dbv-specs-ops).
+
+La documentación en `docs/` es la fuente única de verdad:
 
 - `docs/SPECIFICATIONS.md`: Requisitos detallados y casos de uso.
 - `docs/ARCHITECTURE.md`: Decisiones técnicas y stack tecnológico.
@@ -54,4 +65,21 @@ Este proyecto sigue la metodología **Spec-Driven Development (SDD)**. La docume
 6. Usa `stop.cmd` al finalizar para liberar los recursos del sistema de Windows.
 
 ---
-> Creado por [David Bueno Vallejo](https://github.com/davidbuenov)
+
+## ✍️ Autores y Créditos / Authors & Credits
+
+### 👤 Concebido y dirigido por / Conceived and directed by
+
+#### David Bueno Vallejo
+
+> "Idea original, visión de la metodología, diseño del sistema de documentos, pruebas y refinamiento."
+> "Original idea, methodology vision, document system design, testing and refinement."
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-davidbueno-0A66C2?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/davidbueno/)
+[![Website](https://img.shields.io/badge/Web-davidbuenov.com-6366f1?logo=google-chrome&logoColor=white)](https://davidbuenov.com)
+
+### 🤖 Construido con / Built with AI Pair Programming
+
+| Tool | Role |
+|---|---|
+| **[Antigravity](https://antigravity.google)** · *Google DeepMind* | Pair programming principal para arquitectura de prompts, documentación, refinamiento y validación del flujo del proyecto. |
