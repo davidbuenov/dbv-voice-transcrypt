@@ -30,15 +30,28 @@ PROMPT_TEMPLATES: dict[str, str] = {
         "Extrae los conceptos clave, términos importantes o nombres propios de la siguiente "
         "transcripción, y ofrécelos como una lista tipo glosario en Markdown:\n\n"
     ),
-    "actions": (
-        "Revisa la siguiente transcripción e identifica todas las tareas, compromisos o "
-        "'Action Items' mencionados. Formatéalos en una lista de Markdown con casillas de "
-        "verificación (checkboxes):\n\n"
-    ),
     "mindmap": (
         "Crea un esquema jerárquico o mapa mental estructurado en viñetas multinivel usando "
         "Markdown, que capture la estructura lógica de los temas discutidos en la "
         "transcripción:\n\n"
+    ),
+    "speaker_profiling": (
+        "Analiza esta transcripción e intenta deducir el rol, profesión o perfil psicológico de cada locutor "
+        "(ej. Entrevistador/Candidato, Médico/Paciente, Profesor/Alumno) basándote en lo que dicen y cómo lo dicen. "
+        "Dame un resumen de la personalidad o postura de cada uno en formato Markdown:\n\n"
+    ),
+    "speaker_contributions": (
+        "Extrae las ideas principales o conclusiones que ha aportado CADA locutor por separado a lo largo de la "
+        "transcripción. Estructúralo con viñetas agrupadas bajo el nombre de cada Speaker en formato Markdown:\n\n"
+    ),
+    "speaker_actions": (
+        "Analiza el texto y crea una lista de 'Siguientes Pasos' o tareas pendientes. Especifica claramente "
+        "qué tarea se ha acordado y QUÉ LOCUTOR (Speaker) se ha comprometido a hacerla. Usa Markdown con checkboxes:\n\n"
+    ),
+    "speaker_interview": (
+        "Convierte esta transcripción en bruto en un artículo formato entrevista para una revista o un acta formal. "
+        "Elimina las muletillas, mejora la cohesión y sustituye las etiquetas genéricas de SPEAKER por nombres "
+        "lógicos si puedes deducirlos (ej. 'Entrevistador:' y 'Entrevistado:'). Usa formato Markdown:\n\n"
     ),
     "template": (
         "Transforma esta transcripción en un documento formal usando una 'Plantilla Inteligente'. "

@@ -8,7 +8,7 @@
 ## Project Identity
 
 - **Name:** DBV VoiceTranscrypt
-- **Description:** Aplicación web para la transcripción y análisis de audio de forma 100% local con Whisper y Gemma 4.
+- **Description:** Aplicación web para la transcripción y análisis de audio de forma 100% local con WhisperX (Diarización) y Gemma 4.
 - **Author / Company:** David Bueno Vallejo · https://github.com/davidbuenov
 - **License:** MIT
 - **Languages:** Python, JavaScript, HTML, CSS

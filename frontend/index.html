@@ -93,46 +93,75 @@
             </div>
             
             <div class="ai-options">
-                <button class="ai-option-card" data-type="summary">
-                    <span class="icon">📄</span>
-                    <span>Resumen Ejecutivo</span>
-                </button>
-                <button class="ai-option-card" data-type="concepts">
-                    <span class="icon">📝</span>
-                    <span>Conceptos Clave</span>
-                </button>
-                <button class="ai-option-card" data-type="actions">
-                    <span class="icon">✅</span>
-                    <span>Action Items</span>
-                </button>
-                <button class="ai-option-card" data-type="mindmap">
-                    <span class="icon">🧠</span>
-                    <span>Estructura / Mapa</span>
-                </button>
-                <button class="ai-option-card" data-type="template">
-                    <span class="icon">📋</span>
-                    <span>Plantilla Inteligente</span>
-                </button>
-                <button class="ai-option-card" data-type="full_content">
-                    <span class="icon">📖</span>
-                    <span>Contenido Completo</span>
-                </button>
-                <button class="ai-option-card" data-type="qa">
-                    <span class="icon">❓</span>
-                    <span>Preguntas y Respuestas</span>
-                </button>
-                <button class="ai-option-card" data-type="followup">
-                    <span class="icon">✉️</span>
-                    <span>Email Seguimiento</span>
-                </button>
-                <button class="ai-option-card" data-type="sentiment">
-                    <span class="icon">🎭</span>
-                    <span>Tono y Sentimiento</span>
-                </button>
-                <button class="ai-option-card" data-type="custom">
-                    <span class="icon">✨</span>
-                    <span>Prompt Personalizado</span>
-                </button>
+                <div class="prompt-category">
+                    <h3 class="prompt-category-title">📝 Análisis General</h3>
+                    <div class="prompt-grid">
+                        <button class="ai-option-card" data-type="summary">
+                            <span class="icon">📄</span>
+                            <span>Resumen Ejecutivo</span>
+                        </button>
+                        <button class="ai-option-card" data-type="concepts">
+                            <span class="icon">📝</span>
+                            <span>Conceptos Clave</span>
+                        </button>
+                        <button class="ai-option-card" data-type="mindmap">
+                            <span class="icon">🧠</span>
+                            <span>Estructura / Mapa</span>
+                        </button>
+                        <button class="ai-option-card" data-type="template">
+                            <span class="icon">📋</span>
+                            <span>Plantilla Inteligente</span>
+                        </button>
+                        <button class="ai-option-card" data-type="full_content">
+                            <span class="icon">📖</span>
+                            <span>Contenido Completo</span>
+                        </button>
+                        <button class="ai-option-card" data-type="qa">
+                            <span class="icon">❓</span>
+                            <span>Preguntas y Respuestas</span>
+                        </button>
+                        <button class="ai-option-card" data-type="followup">
+                            <span class="icon">✉️</span>
+                            <span>Email Seguimiento</span>
+                        </button>
+                        <button class="ai-option-card" data-type="sentiment">
+                            <span class="icon">🎭</span>
+                            <span>Tono y Sentimiento</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="prompt-category">
+                    <h3 class="prompt-category-title">🗣️ Análisis por Locutores (Diarización)</h3>
+                    <div class="prompt-grid">
+                        <button class="ai-option-card" data-type="speaker_profiling">
+                            <span class="icon">🕵️‍♂️</span>
+                            <span>Perfilado de Locutores</span>
+                        </button>
+                        <button class="ai-option-card" data-type="speaker_contributions">
+                            <span class="icon">📊</span>
+                            <span>Aportaciones por Persona</span>
+                        </button>
+                        <button class="ai-option-card" data-type="speaker_actions">
+                            <span class="icon">✅</span>
+                            <span>Asignación de Tareas</span>
+                        </button>
+                        <button class="ai-option-card" data-type="speaker_interview">
+                            <span class="icon">🎙️</span>
+                            <span>Formato Entrevista</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="prompt-category">
+                    <h3 class="prompt-category-title">✨ Personalizado</h3>
+                    <div class="prompt-grid">
+                        <button class="ai-option-card" data-type="custom">
+                            <span class="icon">✨</span>
+                            <span>Prompt Personalizado</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div id="custom-prompt-container" class="custom-prompt-container hidden">

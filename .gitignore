@@ -17,3 +17,6 @@ gemma4/bin/*
 !gemma4/bin/.keep
 gemma4/models/*
 !gemma4/models/.keep
+
+# Documentación interna de IA
+docs/MEMORY.md

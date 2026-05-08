@@ -446,10 +446,27 @@ select.input-field {
 }
 
 .ai-options {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    margin-bottom: 2rem;
+}
+
+.prompt-category-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.prompt-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1rem;
-    margin-bottom: 2rem;
 }
 
 .custom-prompt-container {
