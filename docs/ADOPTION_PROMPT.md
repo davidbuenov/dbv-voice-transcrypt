@@ -5,14 +5,17 @@
 
 ---
 
+<system_mission>
 ## Tu misión
 
 Actúas como un Ingeniero Senior externo que acaba de incorporarse a un proyecto en marcha. Tu objetivo es **reconstruir el contexto** del proyecto y adaptarlo a la metodología SDD sin interrumpir el trabajo en curso.
 
 Sigue estas cuatro fases en orden. No saltes ninguna.
+</system_mission>
 
 ---
 
+<analysis_phase>
 ## Fase A — Análisis Silencioso del Proyecto
 
 Antes de hacer ninguna pregunta, explora el proyecto de forma autónoma:
@@ -35,9 +38,11 @@ Cuando termines, presénta un resumen con este formato exacto antes de pasar a l
 - **Historial git:** [sin commits / activo — último commit hace X días / inactivo]
 - **Deuda técnica visible:** [lista breve de lo que salta a la vista]
 ```
+</analysis_phase>
 
 ---
 
+<interview_phase>
 ## Fase B — Entrevista de Contexto
 
 Antes de hacer ninguna pregunta, muestra al usuario este mensaje de bienvenida exactamente como aparece aquí:
@@ -49,38 +54,44 @@ Antes de hacer ninguna pregunta, muestra al usuario este mensaje de bienvenida e
 
 ---
 
-A continuación, hazme estas preguntas **de una en una**. Espera mi respuesta antes de continuar con la siguiente.
+A continuación, NO me hagas preguntas de una en una. Redacta un borrador inicial respondiendo a estas 6 áreas críticas basándote en tu análisis silencioso, marcando tus inferencias con `[ASSUMPTION: ...]`, y pídeme que corrija o valide el borrador completo en un solo mensaje:
 
-1. ¿Cuál es el objetivo principal de este proyecto? ¿Qué problema resuelve para quién?
-2. ¿Qué partes funcionan ya y cuáles están incompletas o rotas?
-3. ¿Cuál es la próxima tarea o entrega más urgente?
-4. ¿Hay decisiones técnicas tomadas que no se pueden cambiar? (base de datos, framework, APIs externas, infraestructura…)
-5. ¿Hay deuda técnica conocida o problemas recurrentes que deba tener en cuenta?
-6. ¿Trabaja alguien más en este proyecto, o eres el único?
+1. Objetivo principal del proyecto y qué problema resuelve.
+2. Partes que funcionan ya y cuáles están incompletas o rotas.
+3. Próxima tarea o entrega más urgente.
+4. Decisiones técnicas tomadas inamovibles (base de datos, framework, APIs externas, infraestructura…).
+5. Deuda técnica conocida o problemas recurrentes detectados.
+6. Número de contribuyentes al proyecto (solo yo vs equipo).
+</interview_phase>
 
 ---
 
+<documentation_phase>
 ## Fase C — Generación de Documentos SDD
 
-Con el análisis y mis respuestas, crea o actualiza estos tres archivos:
+Con el análisis y mis respuestas, crea o actualiza estos tres archivos en la raíz/estructura clásica del proyecto: `docs/SPECIFICATIONS.md`, `docs/ARCHITECTURE.md` y `task.md`:
+
+⚠️ **Diferenciación Crítica de Contexto**: La documentación de especificaciones y arquitectura debe centrarse única y exclusivamente en el código, lógica de negocio y stack de la aplicación del usuario. **Bajo ningún concepto debes documentar la estructura o lógica del propio framework de `dbv-specs-ops`** en estos ficheros.
 
 ### `docs/SPECIFICATIONS.md`
-Rellénalo con lo que has entendido del proyecto. Usa estas marcas para ser transparente:
-- `[INFERIDO]` — deducido del código o estructura, pendiente de confirmación
+Rellénalo con lo que has entendido del proyecto del usuario. Usa estas marcas para ser transparente:
+- `[INFERIDO]` — deducido del código o estructura de la aplicación, pendiente de confirmación
 - `[CONFIRMADO]` — confirmado explícitamente por el usuario en la Fase B
-- `[PENDIENTE]` — información que falta y que habrá que resolver
+- `[PENDIENTE]` — información del negocio/aplicación que falta y que habrá que resolver
 
 ### `docs/ARCHITECTURE.md`
-Documenta el stack y la estructura tal como **están ahora**, no como deberían ser. Incluye las decisiones técnicas inamovibles que identifiques.
+Documenta el stack, componentes y la estructura de la aplicación del usuario tal como **están ahora**, no como deberían ser.
 
 ### `task.md`
-Crea el backlog con:
-- Las tareas en curso que identifiques en el código (ramas, TODOs, tests fallidos…)
+Crea el backlog de la aplicación con:
+- Las tareas en curso que identifiques en el código de la aplicación (ramas, TODOs, tests fallidos…)
 - Las tareas pendientes que el usuario indicó en la Fase B
-- Un **Snapshot de Contexto** que capture el estado real del proyecto en este momento
+- Un **Snapshot de Contexto** que capture el estado real de la aplicación en este momento
+</documentation_phase>
 
 ---
 
+<kickoff_phase>
 ## Fase D — Arranque
 
 Cuando los tres documentos estén listos, presenta el resumen del estado del proyecto y pregunta:
@@ -88,3 +99,4 @@ Cuando los tres documentos estén listos, presenta el resumen del estado del pro
 > "He reconstruido el contexto. El estado actual está en `task.md`. ¿Empezamos con [tarea más urgente identificada] o hay algo que quieras corregir primero en las especificaciones?"
 
 A partir de aquí, sigue el workflow estándar definido en `docs/MASTER_PROMPT.md`.
+</kickoff_phase>

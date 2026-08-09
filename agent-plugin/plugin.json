@@ -1,0 +1,14 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "dbv-voice-transcrypt-plugin",
+  "version": "1.0.0",
+  "description": "Transcripcion y analisis de audio 100% local (WhisperX + Gemini/OpenAI/Claude/Gemma 4) expuesto como herramientas MCP.",
+  "author": {
+    "name": "David Bueno Vallejo",
+    "url": "https://github.com/davidbuenov"
+  },
+  "homepage": "https://github.com/davidbuenov/dbv-voice-transcrypt",
+  "repository": "https://github.com/davidbuenov/dbv-voice-transcrypt",
+  "license": "MIT",
+  "keywords": ["audio", "transcription", "whisperx", "llm", "diarization"]
+}

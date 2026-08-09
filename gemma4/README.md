@@ -33,4 +33,8 @@ Si quieres lanzarlo directamente desde aquí:
 python start_gemma.py
 ```
 
-El servidor arrancará en el puerto `8080` de tu máquina local y estará listo para procesar peticiones HTTP compatibles con la API de OpenAI en `http://127.0.0.1:8080/v1/chat/completions`.
+Por defecto, el servidor arranca en `http://127.0.0.1:8080/v1/chat/completions` (API compatible con OpenAI). `backend/llm_service.py` usa esa misma dirección para enviarle las peticiones de análisis.
+
+## ⚙️ Configuración (opcional)
+
+Si necesitas cambiar el puerto, el contexto o la distribución en GPU (por ejemplo, porque el 8080 ya está en uso o tu tarjeta tiene menos VRAM), copia `.env.example` a `.env` en esta misma carpeta y ajusta los valores. No contiene secretos — es configuración local de tu máquina. `start_gemma.py` y `backend/llm_service.py` leen el mismo fichero, así que solo hace falta cambiarlo aquí una vez.

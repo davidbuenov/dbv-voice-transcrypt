@@ -16,8 +16,21 @@ Responsabilidades:
 Futuros proveedores (ej. Gemma 4 local) se añadirán aquí sin tocar main.py.
 """
 
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 from google import genai
+from openai import OpenAI
+from anthropic import Anthropic
 import httpx
+
+# gemma4/ es un módulo autónomo con su propio .env (host/puerto de llama-server).
+# Se carga explícitamente por ruta absoluta (relativa a este fichero, no al cwd)
+# para que host/puerto de Gemma se resuelvan igual desde main.py (cwd=backend/)
+# y desde agent-plugin/mcp_server.py (puede lanzarse desde cualquier cwd).
+_GEMMA_ENV_PATH = Path(__file__).resolve().parent.parent / "gemma4" / ".env"
+load_dotenv(_GEMMA_ENV_PATH)
 
 # Mapa de transformación → instrucción de sistema.
 # Centralizado aquí para facilitar ajustes de prompts sin tocar la API.
@@ -93,40 +106,88 @@ def build_prompt(transformation: str) -> str:
     return PROMPT_TEMPLATES.get(transformation, FALLBACK_PROMPT)
 
 
-def analyze_with_gemini(text: str, model: str, api_key: str, transformation: str, custom_prompt: str = "") -> str:
-    """Llama a la API de Gemini y devuelve el texto generado.
+def _resolve_system_instruction(transformation: str, custom_prompt: str) -> str:
+    """Devuelve la instrucción de sistema para (transformation, custom_prompt).
+
+    Compartida por los proveedores basados en chat (Gemini, OpenAI, Claude),
+    que usan la misma redacción robusta para el modo "custom".
     """
-    client = genai.Client(api_key=api_key)
-    
-    # Construcción robusta del prompt
     if transformation == "custom" and custom_prompt:
-        system_instruction = (
+        return (
             "Eres un asistente experto en procesamiento de texto. "
             "Sigue EXCLUSIVAMENTE las siguientes instrucciones del usuario:\n\n"
             f"--- INSTRUCCIONES DEL USUARIO ---\n{custom_prompt}\n"
             "--- FIN DE INSTRUCCIONES ---\n\n"
             "Aplica estas instrucciones al siguiente texto:\n"
         )
-    else:
-        system_instruction = build_prompt(transformation)
+    return build_prompt(transformation)
 
+
+def analyze_with_gemini(text: str, model: str, api_key: str, transformation: str, custom_prompt: str = "") -> str:
+    """Llama a la API de Gemini y devuelve el texto generado.
+    """
+    client = genai.Client(api_key=api_key)
+    system_instruction = _resolve_system_instruction(transformation, custom_prompt)
     prompt = f"{system_instruction}\n\n--- TEXTO A PROCESAR ---\n{text}"
 
     response = client.models.generate_content(model=model, contents=prompt)
     return response.text
 
 
+def analyze_with_openai(text: str, model: str, api_key: str, transformation: str, custom_prompt: str = "") -> str:
+    """Llama a la API de OpenAI (Chat Completions) y devuelve el texto generado.
+    """
+    system_instruction = _resolve_system_instruction(transformation, custom_prompt)
+
+    client = OpenAI(api_key=api_key)
+    response = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": system_instruction},
+            {"role": "user", "content": text},
+        ],
+    )
+    return response.choices[0].message.content
+
+
+def analyze_with_claude(text: str, model: str, api_key: str, transformation: str, custom_prompt: str = "") -> str:
+    """Llama a la API de Anthropic (Claude) y devuelve el texto generado.
+    """
+    system_instruction = _resolve_system_instruction(transformation, custom_prompt)
+
+    client = Anthropic(api_key=api_key)
+    response = client.messages.create(
+        model=model,
+        # A diferencia de Gemini/OpenAI, la API de Claude exige max_tokens.
+        # 8192 evita truncar transformaciones largas (full_content, mindmap)
+        # sobre transcripciones extensas; Gemini/OpenAI no tienen tope explícito.
+        max_tokens=8192,
+        system=system_instruction,
+        messages=[{"role": "user", "content": text}],
+    )
+    return response.content[0].text
+
+
+
+
+def _gemma_local_base_url() -> str:
+    """Host:puerto de llama-server, leídos de gemma4/.env (LLAMA_HOST/LLAMA_PORT).
+
+    Si gemma4/.env no existe o no define estas variables, usa los mismos
+    valores por defecto que gemma4/start_gemma.py (127.0.0.1:8080).
+    """
+    host = os.getenv("LLAMA_HOST", "127.0.0.1")
+    port = os.getenv("LLAMA_PORT", "8080")
+    return f"http://{host}:{port}"
 
 
 def analyze_with_gemma_local(text: str, model: str, transformation: str, custom_prompt: str = "") -> str:
     """Llama a un servidor local compatible con OpenAI (Llama.cpp, Ollama, etc).
     """
-    if transformation == "custom" and custom_prompt:
-        system_instruction = f"Instrucción específica: {custom_prompt}. Responde solo lo solicitado."
-    else:
-        system_instruction = build_prompt(transformation)
-    
-    url = "http://127.0.0.1:8080/v1/chat/completions"
+    system_instruction = _resolve_system_instruction(transformation, custom_prompt)
+
+    base_url = _gemma_local_base_url()
+    url = f"{base_url}/v1/chat/completions"
     payload = {
         "model": model,
         "messages": [
@@ -136,8 +197,6 @@ def analyze_with_gemma_local(text: str, model: str, transformation: str, custom_
         "temperature": 0.3
     }
 
-
-    
     try:
         with httpx.Client(timeout=120.0) as client:
             response = client.post(url, json=payload)
@@ -146,9 +205,9 @@ def analyze_with_gemma_local(text: str, model: str, transformation: str, custom_
             return data["choices"][0]["message"]["content"]
     except httpx.ConnectError:
         raise RuntimeError(
-            "No se pudo conectar con el servidor local de Gemma 4. "
-            "Asegúrate de que llama-server esté corriendo en http://127.0.0.1:8080. "
-            "Sugerencia: Ejecuta 'start_gemma.cmd' en la raíz del proyecto."
+            f"No se pudo conectar con el servidor local de Gemma 4. "
+            f"Asegúrate de que llama-server esté corriendo en {base_url}. "
+            f"Sugerencia: Ejecuta 'start_gemma.cmd' en la raíz del proyecto."
         )
     except Exception as e:
         raise RuntimeError(f"Error en la comunicación con Gemma 4 Local: {str(e)}")

@@ -23,14 +23,15 @@ from fastapi import FastAPI, UploadFile, File, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel
 import shutil
 import os
 
 from whisper_service import transcribe_audio
-from llm_service import analyze_with_gemini, analyze_with_gemma_local
+from llm_service import analyze_with_gemini, analyze_with_gemma_local, analyze_with_openai, analyze_with_claude
 
-app = FastAPI(title="DBV VoiceTranscrypt", version="2.0.0")
+app = FastAPI(title="DBV VoiceTranscrypt", version="2.1.0")
 
 # CORS abierto a todos los orígenes porque esta aplicación está diseñada
 # para ejecutarse exclusivamente en localhost (uso personal/local).
@@ -45,6 +46,18 @@ app.add_middleware(
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+def _uploaded_file_path(filename: str) -> str:
+    """Resuelve la ruta de un fichero dentro de UPLOAD_DIR a partir de un nombre
+    controlado por el cliente (subida HTTP o mensaje de WebSocket).
+
+    Se descarta cualquier componente de directorio del nombre (os.path.basename)
+    para que un nombre como "../../etc/passwd" o una ruta absoluta no permita
+    escribir ni leer fuera de UPLOAD_DIR.
+    """
+    safe_filename = os.path.basename(filename)
+    return os.path.join(UPLOAD_DIR, safe_filename)
 
 # Monta los archivos estáticos para servir el frontend vanilla
 app.mount("/static", StaticFiles(directory="../frontend"), name="static")
@@ -70,7 +83,7 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     try:
         filename = await websocket.receive_text()
-        file_path = os.path.join(UPLOAD_DIR, filename)
+        file_path = _uploaded_file_path(filename)
 
         if not os.path.exists(file_path):
             await websocket.send_text(f"Error: Archivo {filename} no encontrado en el servidor.")
@@ -92,11 +105,12 @@ async def upload_audio(file: UploadFile = File(...)):
     Soporta archivos grandes (~256 MB) copiando por chunks con shutil.
     El nombre resultante se usa como referencia en el WebSocket.
     """
-    file_location = os.path.join(UPLOAD_DIR, file.filename)
+    file_location = _uploaded_file_path(file.filename)
+    safe_filename = os.path.basename(file_location)
     with open(file_location, "wb+") as file_object:
         shutil.copyfileobj(file.file, file_object)
 
-    return {"info": f"Archivo '{file.filename}' subido exitosamente.", "filename": file.filename}
+    return {"info": f"Archivo '{safe_filename}' subido exitosamente.", "filename": safe_filename}
 
 
 class AnalyzeRequest(BaseModel):
@@ -115,21 +129,32 @@ async def analyze_text(req: AnalyzeRequest):
     La construcción de prompts y la llamada al SDK están encapsuladas
     en llm_service.py para mantener este endpoint como orquestador puro.
     """
-    if req.provider not in ["gemini", "gemma-local"]:
+    cloud_providers = {
+        "gemini": analyze_with_gemini,
+        "openai": analyze_with_openai,
+        "claude": analyze_with_claude,
+    }
+
+    if req.provider not in cloud_providers and req.provider != "gemma-local":
         return JSONResponse(
             status_code=400,
-            content={"status": "error", "detail": "Proveedor no soportado aún. Use 'gemini' o 'gemma-local'."},
+            content={"status": "error", "detail": "Proveedor no soportado aún. Use 'gemini', 'openai', 'claude' o 'gemma-local'."},
         )
 
-    if req.provider == "gemini" and (not req.api_key or req.api_key == "local"):
+    if req.provider in cloud_providers and (not req.api_key or req.api_key == "local"):
         return JSONResponse(
             status_code=400,
-            content={"status": "error", "detail": "La API Key es obligatoria para Gemini."},
+            content={"status": "error", "detail": f"La API Key es obligatoria para {req.provider}."},
         )
 
     try:
-        if req.provider == "gemini":
-            result = analyze_with_gemini(
+        # Los SDKs de Gemini/OpenAI/Claude/llama-server son síncronos (I/O de red
+        # bloqueante). Se ejecutan en el threadpool de FastAPI para no congelar
+        # el event loop mientras esperan respuesta (lo que bloquearía, por
+        # ejemplo, los mensajes de progreso del WebSocket de transcripción).
+        if req.provider in cloud_providers:
+            result = await run_in_threadpool(
+                cloud_providers[req.provider],
                 text=req.text,
                 model=req.model,
                 api_key=req.api_key,
@@ -137,7 +162,8 @@ async def analyze_text(req: AnalyzeRequest):
                 custom_prompt=req.custom_prompt,
             )
         else:
-            result = analyze_with_gemma_local(
+            result = await run_in_threadpool(
+                analyze_with_gemma_local,
                 text=req.text,
                 model=req.model,
                 transformation=req.transformation,

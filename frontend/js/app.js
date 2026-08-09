@@ -131,21 +131,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const li = document.createElement('li');
             li.className = `file-item ${item.status}`;
             
-            const icon = item.status === 'done' ? 'check-circle' : (item.status === 'processing' ? 'spinner fa-spin' : 'file-audio');
-            
+            const iconName = item.status === 'done' ? 'check-circle' : (item.status === 'processing' ? 'loader' : 'file-audio');
+
             li.innerHTML = `
-                <i class="fas fa-${icon}"></i>
+                ${Icons.svg(iconName, 18)}
                 <span class="file-name">${item.file.name}</span>
                 <div class="file-controls">
                     ${!isProcessing ? `
                         <button class="control-btn" onclick="moveFile(${index}, -1)" title="Subir">
-                            <i class="fas fa-chevron-up"></i>
+                            ${Icons.svg('chevron-up', 14)}
                         </button>
                         <button class="control-btn" onclick="moveFile(${index}, 1)" title="Bajar">
-                            <i class="fas fa-chevron-down"></i>
+                            ${Icons.svg('chevron-down', 14)}
                         </button>
                         <button class="control-btn" onclick="removeFile(${index})" title="Eliminar">
-                            <i class="fas fa-times"></i>
+                            ${Icons.svg('x', 14)}
                         </button>
                     ` : ''}
                 </div>
@@ -305,14 +305,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Lógica de Inteligencia Artificial (Fase 2)
-    const savedKey = localStorage.getItem('gemini_api_key');
-    if (savedKey) apiKeyInput.value = savedKey;
+    // Lógica de Inteligencia Artificial: cada proveedor cloud guarda su propia
+    // API Key en localStorage bajo su propio namespace (ej. "openai_api_key"),
+    // para no enviar por error la clave de un proveedor a otro al cambiar de modelo.
+    function currentProvider() {
+        const selectedOption = aiModel.options[aiModel.selectedIndex];
+        return selectedOption.dataset.provider || 'gemini';
+    }
+
+    function apiKeyStorageName(provider) {
+        return `${provider}_api_key`;
+    }
 
     saveKeyBtn.addEventListener('click', () => {
         const key = apiKeyInput.value.trim();
+        const storageName = apiKeyStorageName(currentProvider());
         if (key) {
-            localStorage.setItem('gemini_api_key', key);
+            localStorage.setItem(storageName, key);
             saveKeyBtn.textContent = 'Guardada';
             saveKeyBtn.classList.remove('btn-secondary');
             saveKeyBtn.classList.add('btn-primary');
@@ -322,24 +331,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveKeyBtn.classList.remove('btn-primary');
             }, 2000);
         } else {
-            localStorage.removeItem('gemini_api_key');
+            localStorage.removeItem(storageName);
             saveKeyBtn.textContent = 'Borrada';
             setTimeout(() => saveKeyBtn.textContent = 'Guardar Key', 2000);
         }
     });
 
     aiModel.addEventListener('change', () => {
-        const selectedOption = aiModel.options[aiModel.selectedIndex];
-        const provider = selectedOption.dataset.provider || 'gemini';
+        const provider = currentProvider();
         if (provider === 'gemma-local') {
             apiKeyInput.classList.add('hidden');
             saveKeyBtn.classList.add('hidden');
         } else {
             apiKeyInput.classList.remove('hidden');
             saveKeyBtn.classList.remove('hidden');
+            apiKeyInput.value = localStorage.getItem(apiKeyStorageName(provider)) || '';
         }
     });
-    
+
     // Disparar el evento una vez para inicializar el estado correcto
     aiModel.dispatchEvent(new Event('change'));
 
@@ -356,11 +365,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleAiAnalysis(card) {
             const selectedOption = aiModel.options[aiModel.selectedIndex];
-            const provider = selectedOption.dataset.provider || 'gemini';
+            const provider = currentProvider();
             const key = apiKeyInput.value.trim();
-            
-            if (provider === 'gemini' && !key) {
-                alert('Por favor, introduce tu API Key de Gemini primero.');
+
+            if (provider !== 'gemma-local' && !key) {
+                alert(`Por favor, introduce tu API Key de ${selectedOption.textContent} primero.`);
                 apiKeyInput.focus();
                 return;
             }
@@ -426,10 +435,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         aiResultContent.textContent = data.result;
                     }
                 } else {
-                    aiResultContent.innerHTML = `<p style="color:#f87171;">Error: ${data.detail || 'Fallo en la comunicación con la IA'}</p>`;
+                    aiResultContent.innerHTML = `<p class="text-error">Error: ${data.detail || 'Fallo en la comunicación con la IA'}</p>`;
                 }
             } catch (error) {
-                aiResultContent.innerHTML = `<p style="color:#f87171;">Error de red: ${error.message}</p>`;
+                aiResultContent.innerHTML = `<p class="text-error">Error de red: ${error.message}</p>`;
             }
     }
 

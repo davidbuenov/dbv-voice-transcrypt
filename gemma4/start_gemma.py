@@ -13,7 +13,11 @@ import urllib.request
 import urllib.error
 from pathlib import Path
 
-# Configuración básica (podría extenderse con python-dotenv)
+from dotenv import load_dotenv
+
+# Configuración leída de gemma4/.env (con defaults si el fichero no existe o
+# no define alguna variable). Debe coincidir con lo que lee backend/llm_service.py
+# para el mismo .env — si cambias el puerto aquí, el cliente lo respeta también.
 GEMMA4_DIR = Path(__file__).resolve().parent
 BIN_DIR = GEMMA4_DIR / "bin"
 MODELS_DIR = GEMMA4_DIR / "models"
@@ -22,10 +26,13 @@ LLAMA_EXE = BIN_DIR / "llama-server.exe"
 MODEL_GGUF = MODELS_DIR / "gemma-4-E2B-it-Q4_K_M.gguf"
 MMPROJ_GGUF = MODELS_DIR / "mmproj-F16.gguf"
 
-HOST = "127.0.0.1"
-PORT = 8080
-CTX_SIZE = 32768
-GPU_LAYERS = 99
+load_dotenv(GEMMA4_DIR / ".env")
+
+HOST = os.getenv("LLAMA_HOST", "127.0.0.1")
+PORT = int(os.getenv("LLAMA_PORT", "8080"))
+CTX_SIZE = int(os.getenv("LLAMA_CTX_SIZE", "32768"))
+GPU_LAYERS = int(os.getenv("LLAMA_N_GPU_LAYERS", "99"))
+FLASH_ATTENTION = "on" if os.getenv("LLAMA_FLASH_ATTENTION", "true").strip().lower() in ("1", "true", "on", "yes") else "off"
 
 def _llama_alive() -> bool:
     try:
@@ -75,7 +82,7 @@ def main():
         "--port", str(PORT),
         "-c", str(CTX_SIZE),
         "--n-gpu-layers", str(GPU_LAYERS),
-        "-fa", "on"
+        "-fa", FLASH_ATTENTION
     ]
 
     print("[INFO] Iniciando llama-server...")

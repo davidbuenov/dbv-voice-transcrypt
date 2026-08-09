@@ -12,8 +12,25 @@
 - **Author / Company:** David Bueno Vallejo · https://github.com/davidbuenov
 - **License:** MIT
 - **Languages:** Python, JavaScript, HTML, CSS
-- **Framework Version:** 1.3.0
+- **Technologies / Stack:** FastAPI, WhisperX (faster-whisper), pyannote-audio, Gemini API, Gemma 4 (local)
+- **Agent Readiness (Web):** No — aplicación local sin API pública expuesta a agentes externos.
+- **Framework Version:** 2.4.0
 
+
+---
+
+## Model Routing Guidelines (V2.4.0)
+
+To optimize OpEx (Token Burn) and latency, refer to this routing strategy when executing project development tasks:
+
+| Development Phase | Required Reasoning Complexity | Recommended Model Class | Example Models |
+| --- | --- | --- | --- |
+| `/spec` (Specifications) | Very High | Advanced Reasoning / Frontier Models | Gemini 3.1 Pro, Claude Opus 5, GPT-5.6 Sol |
+| `/plan` (Planning / Architecture) | Very High | Advanced Reasoning / Frontier Models | Gemini 3.1 Pro, Claude Opus 5, GPT-5.6 Sol |
+| `/build` (Code Implementation) | Medium | Fast, high-accuracy coding models | Gemini 3.5 Flash, Claude Sonnet 5, GPT-5.6 Terra |
+| `/test` (Conventional Tests / Evals) | Medium-Low | Fast & cheap models | Gemini 2.5 Flash-Lite, Claude Haiku 5, GPT-5.6 Luna |
+| `/code-simplify` (Security & Refactor) | High | Security-conscious reasoning models | Gemini 3.1 Pro, Claude Sonnet 5, GPT-5.6 Sol |
+| `/ship` (Documentation, Changelog) | Low | Fast, text-optimized models | Gemini 2.5 Flash-Lite, Claude Haiku 5, GPT-5.6 Luna |
 
 ---
 
